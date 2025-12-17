@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Orderly.Api/Orderly.Api.csproj" />
+  <Project Path="Orderly.Tests.Integration/Orderly.Tests.Integration.csproj" Id="46200984-d9f7-4b60-bf4b-753e87633f7c" />
+  <Project Path="Orderly.Tests.Unit/Orderly.Tests.Unit.csproj" Id="180a76a3-fe72-4bcf-979d-b5ffbf3479cc" />
+</Solution>
