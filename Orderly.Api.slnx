@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="Orderly.Api/Orderly.Api.csproj" />
-  <Project Path="Orderly.Tests.Integration/Orderly.Tests.Integration.csproj" Id="46200984-d9f7-4b60-bf4b-753e87633f7c" />
-  <Project Path="Orderly.Tests.Unit/Orderly.Tests.Unit.csproj" Id="180a76a3-fe72-4bcf-979d-b5ffbf3479cc" />
+  <Project Path="Orderly.Application/Orderly.Application.csproj" Id="9dfea047-7475-4c6d-ac7d-187ad3792dee" />
+  <Project Path="Orderly.Domain/Orderly.Domain.csproj" Id="50d921f9-cc10-4759-9745-8054a0f345ca" />
+  <Project Path="Orderly.Infrastructure/Orderly.Infrastructure.csproj" Id="1a2f46c4-5bc4-4b70-9101-2fd10af84094" />
+  <Project Path="Orderly.Tests/Orderly.Tests.csproj" Id="00114fc8-6a69-4e9f-9dc9-bcbb76c34164" />
 </Solution>
