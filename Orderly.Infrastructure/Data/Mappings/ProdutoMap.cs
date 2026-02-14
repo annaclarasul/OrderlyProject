@@ -1,33 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using AutoMapper;
 using Orderly.Domain.Models;
+using Orderly.Infrastructure.Models;
 
-namespace Orderly.Infrastructure.Data.Mappings;
+namespace Orderly.Infrastructure.Mappings;
 
-public class ProdutoMap : IEntityTypeConfiguration<Produto>
+public class ProdutoMap : Profile
 {
-    public void Configure(EntityTypeBuilder<Produto> builder)
+    public ProdutoMap()
     {
-        builder.ToTable("Produtos");
+        CreateMap<Produto, ProdutoPersistencia>();
 
-        builder.HasKey(p => p.Id);
-
-        builder.Property(p => p.Id)
-            .ValueGeneratedNever();
-
-        builder.Property(p => p.Nome)
-            .IsRequired()
-            .HasMaxLength(150);
-
-        builder.Property(p => p.Preco)
-            .IsRequired()
-            .HasPrecision(18, 2);
-
-        builder.Property(p => p.Estoque)
-            .IsRequired();
+        CreateMap<ProdutoPersistencia, Produto>()
+            .ConstructUsing(p => new Produto(
+                p.Nome,
+                p.Preco,
+                p.Estoque
+            ));
     }
 }
-
-
-
-

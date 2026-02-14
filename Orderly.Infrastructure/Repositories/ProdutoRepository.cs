@@ -1,42 +1,51 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Orderly.Domain.Interfaces.Repositories;
 using Orderly.Domain.Models;
 using Orderly.Infrastructure.Data;
-
-namespace Orderly.Infrastructure.Repositories;
+using Orderly.Infrastructure.Models;
 
 public class ProdutoRepository : IProdutoRepository
 {
     private readonly AppDbContext _context;
+    private readonly IMapper _mapper;
 
-    public ProdutoRepository(AppDbContext context)
+    public ProdutoRepository(AppDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     public async Task AddAsync(Produto produto)
     {
-        _context.Produtos.Add(produto);
+        var persistencia = _mapper.Map<ProdutoPersistencia>(produto);
+        await _context.Produtos.AddAsync(persistencia);
         await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Produto produto)
     {
-        _context.Produtos.Update(produto);
+        var persistencia = _mapper.Map<ProdutoPersistencia>(produto);
+        _context.Produtos.Update(persistencia);
         await _context.SaveChangesAsync();
     }
 
     public async Task<Produto?> GetByIdAsync(Guid id)
     {
-        return await _context.Produtos
+        var persistencia = await _context.Produtos
             .FirstOrDefaultAsync(p => p.Id == id);
+
+        return persistencia == null
+            ? null
+            : _mapper.Map<Produto>(persistencia);
     }
 
     public async Task<IEnumerable<Produto>> GetAllAsync()
     {
-        return await _context.Produtos
+        var lista = await _context.Produtos
             .AsNoTracking()
             .ToListAsync();
+
+        return _mapper.Map<IEnumerable<Produto>>(lista);
     }
 }
-

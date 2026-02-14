@@ -4,8 +4,8 @@ namespace Orderly.Domain.Models;
 
 public class Produto : AuditableEntity
 {
-    public string Nome { get; private set; }
-    public decimal Preco { get; private set; }
+    public string Nome { get; }
+    public decimal Preco { get;}
     public int Estoque { get; private set; }
 
     protected Produto() { }

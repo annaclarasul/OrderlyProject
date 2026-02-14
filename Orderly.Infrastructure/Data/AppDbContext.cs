@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Orderly.Domain.Models;
+using Orderly.Infrastructure.Models;
 
 namespace Orderly.Infrastructure.Data;
 
@@ -8,10 +9,10 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
 
-    public DbSet<Cliente> Clientes => Set<Cliente>();
-    public DbSet<Produto> Produtos => Set<Produto>();
-    public DbSet<Pedido> Pedidos => Set<Pedido>();
-    public DbSet<PedidoItem> PedidoItens => Set<PedidoItem>();
+    public DbSet<ClientePersistencia> Clientes => Set<ClientePersistencia>();
+    public DbSet<ProdutoPersistencia> Produtos => Set<ProdutoPersistencia>();
+    public DbSet<PedidoPersistencia> Pedidos => Set<PedidoPersistencia>();
+    public DbSet<PedidoItemPersistencia> PedidoItens => Set<PedidoItemPersistencia>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

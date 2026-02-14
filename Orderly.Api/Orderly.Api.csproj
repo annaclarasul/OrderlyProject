@@ -7,6 +7,10 @@
 		<NoWarn>$(NoWarn);1591</NoWarn>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Compile Include="DTOs\Cliente\CreateClienteRequest.DTOcs" />
+	</ItemGroup>
+
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="12.0.1" />
@@ -22,7 +26,6 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
@@ -33,7 +36,6 @@
 
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Orderly.Application\Orderly.Application.csproj" />
 	  <ProjectReference Include="..\Orderly.Infrastructure\Orderly.Infrastructure.csproj" />
 	</ItemGroup>
 

@@ -1,53 +1,71 @@
-using Microsoft.EntityFrameworkCore;
 using Orderly.Domain.Models;
-using Orderly.Domain.ValueObjects;
-using Orderly.Infrastructure.Data;
-using Orderly.Infrastructure.Repositories;
-using System;
+using Orderly.Domain.Enums;
 using Xunit;
+
+namespace Orderly.Tests.Domain;
 
 public class PedidoTest
 {
-    private AppDbContext CriarContexto()
+    [Fact]
+    public void Deve_Criar_Pedido_Com_Status_Criado()
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase("OrderlyTestDb")
-            .Options;
+        var cliente = new Cliente("fulano", "fulano@email.com");
 
-        return new AppDbContext(options);
+        var pedido = new Pedido(cliente);
+
+        Assert.Equal(StatusPedido.Criado, pedido.Status);
+        Assert.Equal(cliente.Id, pedido.ClienteId);
     }
 
     [Fact]
-    public async Task Deve_Criar_Pedido_Com_Sucesso()
+    public void Deve_Adicionar_Item_Ao_Pedido()
     {
-        // Arrange
-        var context = CriarContexto();
-        var pedidoRepository = new PedidoRepository(context);
-
-        var email = new Email("joao@email.com");
-
-        var cliente = new Cliente("Joao", email);
-
-        context.Clientes.Add(cliente);
-
-        var produto = new Produto("Teclado Gamer com fio", 199m, 10);
-        context.Produtos.Add(produto);
-
-        await context.SaveChangesAsync();
-
-        context.Produtos.Add(produto);
-
-        await context.SaveChangesAsync();
+        var cliente = new Cliente("fulano", "fulano@email.com");
+        var produto = new Produto("Mouse", 100, 10);
 
         var pedido = new Pedido(cliente);
-        pedido.AdicionarItem(produto, 1);
 
-        // Act
-        await pedidoRepository.AddAsync(pedido);
+        pedido.AdicionarItem(produto, 2);
 
-        // Assert
-        var pedidoSalvo = await pedidoRepository.GetByIdAsync(pedido.Id);
-        Assert.NotNull(pedidoSalvo);
-        Assert.Equal(199, pedidoSalvo!.CalcularTotal());
+        Assert.Single(pedido.Itens);
+    }
+
+    [Fact]
+    public void Deve_Calcular_Total_Corretamente()
+    {
+        var cliente = new Cliente("fulano", "fulano@email.com");
+        var produto = new Produto("Teclado", 200, 10);
+
+        var pedido = new Pedido(cliente);
+
+        pedido.AdicionarItem(produto, 3);
+
+        var total = pedido.CalcularTotal();
+
+        Assert.Equal(600, total);
+    }
+
+    [Fact]
+    public void Nao_Deve_Permitir_Quantidade_Invalida()
+    {
+        var cliente = new Cliente("fulano", "fulano@email.com");
+        var produto = new Produto("Monitor", 500, 5);
+
+        var pedido = new Pedido(cliente);
+
+        Assert.Throws<ArgumentException>(() =>
+            pedido.AdicionarItem(produto, 0)
+        );
+    }
+
+    [Fact]
+    public void Deve_Atualizar_Status_Do_Pedido()
+    {
+        var cliente = new Cliente("fulano", "fulano@email.com");
+        var pedido = new Pedido(cliente);
+
+        pedido.AtualizarStatus(StatusPedido.Pago);
+
+        Assert.Equal(StatusPedido.Pago, pedido.Status);
     }
 }

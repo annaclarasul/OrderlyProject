@@ -1,9 +1,16 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Orderly.Application;
+using Orderly.Domain.Interfaces.Repositories;
+using Orderly.Domain.Interfaces.Services;
+using Orderly.Domain.Services;
 using Orderly.Infrastructure;
+using Orderly.Infrastructure.Data;
+using Orderly.Infrastructure.Repositories;
 using System;
 using System.IO;
 
@@ -16,7 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // =======================
-// SWAGGER PROFISSIONAL
+// SWAGGER 
 // =======================
 builder.Services.AddSwaggerGen(c =>
 {
@@ -38,11 +45,23 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-// =======================
-// DEPENDENCY INJECTION
-// =======================
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+// DbContext com SQLite
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// Application Services
+builder.Services.AddScoped<IClienteAppService, ClienteAppService>();
+builder.Services.AddScoped<IProdutoAppService, ProdutoAppService>();
+builder.Services.AddScoped<IPedidoAppService, PedidoAppService>();
+
+// Repositories
+builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
+
 
 // =======================
 // APP
@@ -64,6 +83,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
 
 app.Run();
 

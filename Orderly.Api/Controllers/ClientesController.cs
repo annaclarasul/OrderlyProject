@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Orderly.Api.DTOs.Cliente;
 using Orderly.Application.DTOs.Cliente;
-using Orderly.Application.Interfaces.Services;
+using Orderly.Domain.Interfaces.Services;
+using Orderly.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -27,10 +30,14 @@ public class ClientesController : ControllerBase
 {
     private readonly IClienteAppService _service;
 
-    public ClientesController(IClienteAppService service)
+    private readonly IMapper _mapper;
+
+    public ClientesController(IMapper mapper, IClienteAppService service)
     {
+        _mapper = mapper;
         _service = service;
     }
+
 
     /// <summary>
     /// Cria um novo cliente no sistema.
@@ -46,11 +53,12 @@ public class ClientesController : ControllerBase
     /// <response code="201">Cliente criado com sucesso.</response>
     /// <response code="400">Dados inválidos ou e-mail em formato incorreto.</response>
     [HttpPost]
-    [ProducesResponseType(typeof(ClienteResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ClienteResponseDTO), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateClienteRequest request)
     {
-        var result = await _service.CreateAsync(request);
+        var mapeado = _mapper.Map<Cliente>(request);
+        var result = await _service.CreateAsync(mapeado);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
@@ -66,7 +74,7 @@ public class ClientesController : ControllerBase
     /// </returns>
     /// <response code="200">Lista retornada com sucesso.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<ClienteResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ClienteResponseDTO>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.GetAllAsync());
@@ -84,7 +92,7 @@ public class ClientesController : ControllerBase
     /// <response code="200">Cliente encontrado.</response>
     /// <response code="404">Cliente não encontrado.</response>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(ClienteResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ClienteResponseDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -110,12 +118,14 @@ public class ClientesController : ControllerBase
     /// <response code="404">Cliente não encontrado.</response>
     /// <response code="400">Dados inválidos.</response>
     [HttpPut("{id:guid}")]
-    [ProducesResponseType(typeof(ClienteResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ClienteResponseDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateClienteRequest request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateClienteRequestDTO request)
     {
-        var result = await _service.UpdateAsync(id, request);
+        var mapeado = _mapper.Map<Cliente>(request);
+        var result = await _service.UpdateAsync(id, mapeado);
+        var retotnoMapeado = _mapper.Map<ClienteResponseDTO>(result);
         return Ok(result);
     }
 

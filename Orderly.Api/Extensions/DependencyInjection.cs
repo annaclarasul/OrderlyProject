@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿/*using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Orderly.Application.Interfaces;
 using Orderly.Application.Services;
@@ -14,9 +14,6 @@ namespace Orderly.Api.Extensions
     {
         public static IServiceCollection AddApplication(this IServiceCollection services, string connectionString)
         {
-            // Database
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(connectionString));
 
             // Services
             services.AddScoped<IClienteAppService, ClienteAppService>();
@@ -31,4 +28,4 @@ namespace Orderly.Api.Extensions
             return services;
         }
     }
-}
+}*/

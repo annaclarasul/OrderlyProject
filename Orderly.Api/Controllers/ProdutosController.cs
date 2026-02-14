@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Orderly.Application.DTOs.Produto;
-using Orderly.Application.Interfaces.Services;
+using Orderly.Api.DTOs.Produto;
+using Orderly.Domain.Interfaces.Services;
+using Orderly.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,10 +27,12 @@ namespace Orderly.Api.Controllers;
 public class ProdutosController : ControllerBase
 {
     private readonly IProdutoAppService _service;
+    private readonly IMapper _mapper;
 
-    public ProdutosController(IProdutoAppService service)
+    public ProdutosController(IProdutoAppService service, IMapper mapper)
     {
         _service = service;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -55,11 +59,12 @@ public class ProdutosController : ControllerBase
     /// <response code="201">Produto cadastrado com sucesso.</response>
     /// <response code="400">Dados inválidos ou regras de negócio violadas.</response>
     [HttpPost]
-    [ProducesResponseType(typeof(ProdutoResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProdutoResponseDTO), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromBody] CreateProdutoRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateProdutoRequestDTO request)
     {
-        var result = await _service.CreateAsync(request);
+        var mapeado = _mapper.Map<Produto>(request);
+        var result = await _service.CreateAsync(mapeado);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
@@ -77,7 +82,7 @@ public class ProdutosController : ControllerBase
     /// </returns>
     /// <response code="200">Lista retornada com sucesso.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<ProdutoResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ProdutoResponseDTO>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.GetAllAsync());
@@ -95,7 +100,7 @@ public class ProdutosController : ControllerBase
     /// <response code="200">Produto encontrado.</response>
     /// <response code="404">Produto não encontrado.</response>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(ProdutoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProdutoResponseDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {

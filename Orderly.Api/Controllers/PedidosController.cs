@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Orderly.Application.DTOs.Pedido;
-using Orderly.Application.Interfaces.Services;
+using Orderly.Api.DTOs.Pedido;
+using Orderly.Domain.Interfaces.Services;
+using Orderly.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,11 +27,15 @@ namespace Orderly.Api.Controllers;
 public class PedidosController : ControllerBase
 {
     private readonly IPedidoAppService _service;
+    private readonly IMapper _mapper;
 
-    public PedidosController(IPedidoAppService service)
+    public PedidosController(IPedidoAppService service, IMapper mapper)
     {
         _service = service;
+        _mapper = mapper;
     }
+
+
 
     /// <summary>
     /// Cria um novo pedido no sistema.
@@ -54,12 +60,13 @@ public class PedidosController : ControllerBase
     /// <response code="400">Dados inválidos ou pedido sem itens.</response>
     /// <response code="404">Cliente ou produto não encontrado.</response>
     [HttpPost]
-    [ProducesResponseType(typeof(PedidoResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(PedidoResponseDTO), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create([FromBody] CreatePedidoRequest request)
+    public async Task<IActionResult> Create([FromBody] CreatePedidoRequestDTO request)
     {
-        var result = await _service.CreateAsync(request);
+        var mapeado = _mapper.Map<Pedido>(request);
+        var result = await _service.CreateAsync(mapeado);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
@@ -77,7 +84,7 @@ public class PedidosController : ControllerBase
     /// </returns>
     /// <response code="200">Lista retornada com sucesso.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<PedidoResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<PedidoResponseDTO>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.GetAllAsync());
@@ -95,7 +102,7 @@ public class PedidosController : ControllerBase
     /// <response code="200">Pedido encontrado.</response>
     /// <response code="404">Pedido não encontrado.</response>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(PedidoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PedidoResponseDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
