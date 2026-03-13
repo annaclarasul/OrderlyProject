@@ -10,7 +10,6 @@ using Orderly.Domain.Interfaces.Services;
 using Orderly.Domain.Services;
 using Orderly.Infrastructure;
 using Orderly.Infrastructure.Data;
-using Orderly.Infrastructure.Repositories;
 using System;
 using System.IO;
 

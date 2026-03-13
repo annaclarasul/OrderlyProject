@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-
 namespace Orderly.Domain.Interfaces.Repositories;
 
 public interface IRepository<T> where T : class

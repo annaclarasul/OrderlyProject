@@ -1,66 +1,48 @@
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Orderly.Domain.Interfaces.Repositories;
 using Orderly.Infrastructure.Data;
 
-public class RepositoryBase<TDomain, TPersistencia>
-    : IRepository<TDomain>
-    where TDomain : class
-    where TPersistencia : class
+public class RepositoryBase<T> : IRepository<T> where T : class
 {
     protected readonly AppDbContext _context;
-    protected readonly IMapper _mapper;
-    protected readonly DbSet<TPersistencia> _dbSet;
 
-    public RepositoryBase(AppDbContext context, IMapper mapper)
+    public RepositoryBase(AppDbContext context)
     {
         _context = context;
-        _mapper = mapper;
-        _dbSet = _context.Set<TPersistencia>();
     }
 
-    public async Task AddAsync(TDomain entity)
+    public async Task<T?> GetByIdAsync(Guid id)
     {
-        var persistencia = _mapper.Map<TPersistencia>(entity);
+        return await _context.Set<T>().FindAsync(id);
+    }
 
-        await _dbSet.AddAsync(persistencia);
+    public async Task<IEnumerable<T>> GetAllAsync()
+    {
+        return await _context.Set<T>()
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task AddAsync(T entity)
+    {
+        await _context.Set<T>().AddAsync(entity);
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(TDomain entity)
+    public async Task UpdateAsync(T entity)
     {
-        var persistencia = _mapper.Map<TPersistencia>(entity);
-
-        _dbSet.Update(persistencia);
+        _context.Set<T>().Update(entity);
         await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(Guid id)
     {
-        var entity = await _dbSet.FindAsync(id);
+        var entity = await _context.Set<T>().FindAsync(id);
 
-        if (entity == null)
-            return;
-
-        _dbSet.Remove(entity);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task<TDomain?> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbSet.FindAsync(id);
-
-        return entity == null
-            ? null
-            : _mapper.Map<TDomain>(entity);
-    }
-
-    public async Task<IEnumerable<TDomain>> GetAllAsync()
-    {
-        var list = await _dbSet
-            .AsNoTracking()
-            .ToListAsync();
-
-        return _mapper.Map<IEnumerable<TDomain>>(list);
+        if (entity != null)
+        {
+            _context.Set<T>().Remove(entity);
+            await _context.SaveChangesAsync();
+        }
     }
 }

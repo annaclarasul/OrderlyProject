@@ -1,29 +1,22 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Orderly.Domain.Interfaces.Repositories;
+﻿using Orderly.Domain.Interfaces.Repositories;
 using Orderly.Domain.Models;
 using Orderly.Infrastructure.Data;
-using Orderly.Infrastructure.Models;
-
-namespace Orderly.Infrastructure.Repositories;
 
 public class ClienteRepository
-    : RepositoryBase<Cliente, ClientePersistencia>,
-      IClienteRepository
+    : RepositoryBase<Cliente>, IClienteRepository
 {
-    public ClienteRepository(AppDbContext context, IMapper mapper)
-        : base(context, mapper)
+    public ClienteRepository(AppDbContext context)
+        : base(context)
     {
     }
 
-    public async Task<Cliente?> GetByIdAsync(Guid id)
+    public Task<Cliente?> ObterCliente(Guid id)
     {
-        var persistencia = await _context.Clientes
-            .Include(c => c.Pedidos)
-            .FirstOrDefaultAsync(c => c.Id == id);
+        return GetByIdAsync(id);
+    }
 
-        return persistencia == null
-            ? null
-            : _mapper.Map<Cliente>(persistencia);
+    public Task<IEnumerable<Cliente>> ListarClientes()
+    {
+        return GetAllAsync();
     }
 }
